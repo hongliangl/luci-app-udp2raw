@@ -52,8 +52,19 @@ create_config() {
 	echo "# auto-generated config file from /etc/config/udp2raw" > $config_file
 
 	echo "-c" >> $config_file
-	echo "-l ${listen_addr}:${listen_port}" >> $config_file && _log "info" "listening on: ${listen_addr}:${listen_port}"
-	echo "-r ${server_addr}:${server_port}" >> $config_file
+        if echo "$listen_addr" | grep -q ":"; then
+           echo "-l [${listen_addr}]:${listen_port}" >> $config_file && _log "info" "listening on: [${listen_addr}]:${listen_port}"
+        else
+           echo "-l ${listen_addr}:${listen_port}" >> $config_file && _log "info" "listening on: ${listen_addr}:${listen_port}"
+        fi
+
+        if echo "$server_addr" | grep -q ":"; then
+            echo "-r [${server_addr}]:${server_port}" >> $config_file
+        else
+            echo "-r ${server_addr}:${server_port}" >> $config_file
+        fi
+	# echo "-l ${listen_addr}:${listen_port}" >> $config_file && _log "info" "listening on: ${listen_addr}:${listen_port}"
+	# echo "-r ${server_addr}:${server_port}" >> $config_file
 
 	[ -n "$raw_mode" ] && echo "--raw-mode ${raw_mode}" >> $config_file && _log "info" "raw-mode: ${raw_mode}"
 	[ -n "$key" ] && echo "--key ${key}" >> $config_file
