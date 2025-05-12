@@ -20,6 +20,11 @@ local auth_modes = {
 	"none",
 }
 
+local run_modes = {
+	"server",
+	"client",
+}
+
 m = Map("udp2raw", "%s - %s" %{translate("udp2raw-tunnel"), translate("Edit Server")})
 m.redirect = luci.dispatcher.build_url("admin/services/udp2raw/servers")
 m.sid = sid
@@ -34,6 +39,11 @@ s.anonymous = true
 s.addremove = false
 
 o = s:option(Value, "alias", translate("Alias(optional)"))
+
+o = s:option(ListValue, "run_mode", translate("Run Mode"))
+for _, v in ipairs(run_modes) do o:value(v, v:lower()) end
+o.default = "client"
+o.rmempty = false
 
 o = s:option(Value, "server_addr", translate("Server"))
 o.datatype = "host"

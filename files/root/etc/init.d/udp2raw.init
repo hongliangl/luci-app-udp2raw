@@ -50,6 +50,14 @@ create_config() {
 	local config_file="$1"
 	echo "# auto-generated config file from /etc/config/udp2raw" > $config_file
 
+	if [ "$run_mode" = "client" ]; then
+		echo "-c" >> $config_file && _log "info" "run mode: client"
+	elif [ "$run_mode" = "server" ]; then
+		echo "-s" >> $config_file && _log "info" "run mode: server"
+	else
+		echo "-c" >> $config_file && _log "info" "run mode: default is client"
+	fi
+	
 	echo "-c" >> $config_file
         if echo "$listen_addr" | grep -q ":"; then
            echo "-l [${listen_addr}]:${listen_port}" >> $config_file
@@ -94,6 +102,7 @@ validate_config_section() {
 
 validate_server_section() {
 	local ret=$(/sbin/validate_data "$NAME" servers "$1" \
+		'run_mode:or("client", "server"):client' \
 		'server_addr:host' \
 		'server_port:port:8080' \
 		'listen_addr:ipaddr:127.0.0.1' \
